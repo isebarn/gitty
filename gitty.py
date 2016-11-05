@@ -35,7 +35,7 @@ def connect_to_gitty():
 	return conn, cursor
 	
 # create database
-def create_gitty_db():
+def create_gitty_db(x):
 	tablename = 'create table if not exists gitty('
 	name = 'repo_name varchar(20),'
 	link = 'repo_link varchar(100),'
@@ -163,7 +163,7 @@ def cli(x):
 
 
 
-func = {'push':push, 'repos':repos,'clone':clone, 'cli':cli}
+func = {'push':push, 'repos':repos,'clone':clone, 'cli':cli, 'create_gitty_db':create_gitty_db}
 
 if __name__ == "__main__":
 	cli([]) if len(sys.argv) == 1 else func[sys.argv[1]](sys.argv[2:])
