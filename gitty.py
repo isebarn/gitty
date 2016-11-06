@@ -171,7 +171,8 @@ def cli(x):
 	print '(1)	Check Repos'
 	print '(2)	Clone repo'
 	print '(3)	Push'
-	print '(4)	Exit'
+	print '(4)	Pull'
+	print '(5)	Exit'
 	x = int(raw_input(' '))
 
 	if x == 1:
@@ -180,6 +181,8 @@ def cli(x):
 		clone([])
 	elif x == 3:
 		push([])
+	elif x == 4:
+		pull([])
 
 
 
