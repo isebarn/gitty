@@ -169,19 +169,6 @@ if __name__ == "__main__":
 	cli([]) if len(sys.argv) == 1 else func[sys.argv[1]](sys.argv[2:])
 	
 
-#if(x == str(1)): 
-#	os.system('git pull origin master')
-#elif(x == str(2)):
-#	os.system('git add .')
-#	commit = raw_input("Commit message? ")
-#	os.system('git commit -m "'+ commit + '"')
-#	os.system('git push origin master')
-#elif(x == str(3)):
-#	os.system('git checkout .')
-#elif(x == str(4)):
-#	os.system('git pull --rebase origin master')
-#elif(x == str(5)):
-#	exit()
 
 
 # operations:
