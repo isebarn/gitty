@@ -105,6 +105,7 @@ def clone(x):
 	os.chdir(destination)
 	os.system('git clone ' + link + ' ' + destination)
 
+# push
 def push(x):
 	if len(x) != 1:
 		name = raw_input('Repo name: ')
@@ -144,6 +145,25 @@ def push(x):
 
 	#os.system('clear')
 
+def pull(x):
+	if len(x) != 1:
+		name = raw_input('Repo name: ')
+	else:
+		name = x[0]
+
+	conn, cursor = connect_to_gitty()
+	with conn:
+		cursor.execute("SELECT destination FROM gitty where repo_name is '%s'" % name )
+		r = cursor.fetchall()
+		r = map(utf2str, r)
+		r = r[0][0]
+
+	os.chdir(r)
+	os.system('git init')
+	os.system('git pull')
+
+
+
 # start the command line version
 def cli(x):
 	print 'Welcome to GITTY, my dude'
@@ -163,14 +183,11 @@ def cli(x):
 
 
 
-func = {'push':push, 'repos':repos,'clone':clone, 'cli':cli, 'create_gitty_db':create_gitty_db}
+func = {'pull':pull, 'push':push, 'repos':repos,'clone':clone, 'cli':cli, 'create_gitty_db':create_gitty_db}
 
 if __name__ == "__main__":
 	cli([]) if len(sys.argv) == 1 else func[sys.argv[1]](sys.argv[2:])
 	
-
-######################################
-
 # operations:
 # cli
 # list repos  n = name, l = link,  location status
@@ -178,5 +195,7 @@ if __name__ == "__main__":
 # push  optional repo name commit message
 # checkout
 # reset
+# merge
+# fetch
 # clone optional repo_name url folder
 # log optional number_of_commits view_diff
