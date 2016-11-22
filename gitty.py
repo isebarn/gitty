@@ -39,11 +39,11 @@ def create_gitty_db(x):
 	tablename = 'create table if not exists gitty('
 	name = 'repo_name varchar(20),'
 	link = 'repo_link varchar(100),'
-	location = 'location varchar(100),'
+	destination = 'destination varchar(100),'
 	status = 'status varchar(100));'
 	conn, cursor = connect_to_gitty()
 	with conn: 
-		cursor.execute(tablename + name + link + location + status)
+		cursor.execute(tablename + name + link + destination + status)
 
 # view repos in database
 def repos(x):
@@ -58,15 +58,15 @@ def repos(x):
 		query += ' repo_link,'
 		header = header + ["URL"]
 	if any('d' in s for s in x):
-		header = header + ["Location"]
-		query += ' location'
+		header = header + ["Destination"]
+		query += ' destination'
 	if any('s' in s for s in x):
 		header = header + ["Status"]
 		query += ' status,'
 
 	if len(query) == 0:
 		query = ' * '
-		header = ["Repo", "URL", "Location", "Status"]
+		header = ["Repo", "URL", "Destination", "Status"]
 	else:
 		# remove trailing comma
 		query = query[0:len(query)-1] + ' '
@@ -128,7 +128,7 @@ def push(x):
 			return 
 
 	print "Commiting"
-	printer([["Repo", "URL", "Location"]] + r)
+	printer([["Repo", "URL", "Destination"]] + r)
 	print ""
 	commit = raw_input("Commit message? ")
 
@@ -145,6 +145,7 @@ def push(x):
 
 	#os.system('clear')
 
+# pull
 def pull(x):
 	if len(x) != 1:
 		name = raw_input('Repo name: ')
@@ -162,7 +163,72 @@ def pull(x):
 	os.system('git init')
 	os.system('git pull')
 
+def modify(x):
+	if len(x) != 1:
+		name = raw_input('Repo to modify: ')
+	else: 
+		name = x[0]
 
+	print '(1) Rename Repo'
+	print '(2) Change Destination'
+	print '(3) Change URL'
+	print '(4) Delete Repo'
+	x = int(raw_input(' '))
+
+	if x == 1:
+		new_name = raw_input('New name: ')
+		set_repo_name(name, new_name)		
+	elif x == 2:
+		new_dest = raw_input('New destination: ')
+		set_repo_destination(name, new_dest)
+	elif x == 3:
+		URL = raw_input('New URL: ')
+		set_URL(name, URL)
+	elif x == 4:
+		delete_repo(name)
+
+def add_repo(x):
+	if len(x) != 3:
+		print 'repo_name '
+		name = raw_input(' ')
+		print 'repo_link '
+		link = raw_input(' ')
+		print 'destination '
+		destination = raw_input(' ')
+	else: 
+		name = str(x[0])
+		link = str(x[1])
+		destination = str(x[2])
+
+	status = 'ok'
+
+	conn, cursor = connect_to_gitty()
+	with conn:
+		cursor.execute('INSERT INTO gitty values(?,?,?,?);', (name, link, destination, status))
+
+
+	if not os.path.exists(destination):
+		os.makedirs(destination)
+
+def set_repo_name(old_name, new_name):
+	conn, cursor = connect_to_gitty()
+	with conn:
+		cursor.execute("UPDATE gitty SET repo_name = ? WHERE repo_name = ?", (new_name, old_name))
+
+def set_repo_destination(repo_name, new_dest):
+	conn, cursor = connect_to_gitty()
+	with conn:
+		cursor.execute("UPDATE gitty SET destination = ? WHERE repo_name = ?", (new_dest, repo_name))
+
+def set_URL(repo_name, URL):
+	conn, cursor = connect_to_gitty()
+	with conn:
+		cursor.execute("UPDATE gitty SET repo_link = ? WHERE repo_name = ?", (URL, repo_name))
+
+def delete_repo(repo_name):
+	conn, cursor = connect_to_gitty()
+	with conn:
+		cursor.execute("DELETE FROM gitty WHERE repo_name = ?", (repo_name,))
 
 # start the command line version
 def cli(x):
@@ -172,7 +238,9 @@ def cli(x):
 	print '(2)	Clone repo'
 	print '(3)	Push'
 	print '(4)	Pull'
-	print '(5)	Exit'
+	print '(5)	Modify Repos'
+	print '(6)  Add Repo'
+	print '(7)	Exit'
 	x = int(raw_input(' '))
 
 	if x == 1:
@@ -183,17 +251,23 @@ def cli(x):
 		push([])
 	elif x == 4:
 		pull([])
+	elif x == 5:
+		modify([])
+	elif x == 6:
+		add_repo()
+	else:
+		print 'Later, my dude'
 
 
 
-func = {'pull':pull, 'push':push, 'repos':repos,'clone':clone, 'cli':cli, 'create_gitty_db':create_gitty_db}
+func = {'add':add_repo, 'modify':modify, 'pull':pull, 'push':push, 'repos':repos,'clone':clone, 'cli':cli, 'create_gitty_db':create_gitty_db}
 
 if __name__ == "__main__":
 	cli([]) if len(sys.argv) == 1 else func[sys.argv[1]](sys.argv[2:])
 	
 # operations:
 # cli
-# list repos  n = name, l = link,  location status
+# list repos  n = name, l = link,  destination status
 # pull optional repo name
 # push  optional repo name commit message
 # checkout
