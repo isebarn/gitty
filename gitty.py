@@ -254,7 +254,7 @@ def cli(x):
 	elif x == 5:
 		modify([])
 	elif x == 6:
-		add_repo()
+		add_repo([])
 	else:
 		print 'Later, my dude'
 
